@@ -1,152 +1,312 @@
 # IncidentPilot
 
-> **"An autonomous SRE agent that turns production telemetry into a verified, evidence-backed code fix."**
+An autonomous SRE agent that converts production incidents into a verified, evidence-backed recovery workflow.
 
-IncidentPilot is an autonomous SRE & Engineering Ops agent that reacts to production incidents end-to-end:
-`Telemetry Ingestion ➔ Evidence Correlation ➔ Multi-Hypothesis Evaluation ➔ Failure Reproduction ➔ Root Cause Proof ➔ Minimal Patch ➔ Double-Check Verification ➔ Auditable Incident Report`
+IncidentPilot ingests telemetry, correlates logs and traces, evaluates competing hypotheses, reproduces the bug in a controlled environment, confirms the root cause, generates a minimal fix, and verifies the result before it is considered safe for human review.
 
----
+This project is designed as a demo-ready incident response system for modern engineering teams, combining:
 
-## 💥 The Problem
+- Python backend logic
+- FastAPI API layer
+- React + Vite frontend dashboard
+- Isolated demo repository for incident reproduction
+- Deterministic verification and artifact generation
 
-Traditional monitoring tools tell engineers:
-> *"Something is broken (Checkout API HTTP 500 error rate spiked to 31.4%)."*
+## Why this project exists
 
-Generative AI coding assistants tell engineers:
-> *"Here is some generated code snippet that might fix it."*
+The typical incident workflow is fragmented:
 
-**The missing link**: Neither system proves *why* the incident occurred, evaluates competing explanations, reproduces the actual failure, or independently verifies that the fix resolves the incident without causing regressions.
+- monitoring tells you something is failing
+- logs show partial context
+- engineers guess at the cause
+- patches are proposed without proof
+- verification is inconsistent
 
----
+IncidentPilot closes that gap by building an operational chain of evidence:
 
-## 🚀 The Solution: IncidentPilot
+Telemetry -> Evidence Correlation -> Hypothesis Testing -> Failure Reproduction -> Root Cause Proof -> Patch -> Verification -> Incident Report
 
-IncidentPilot connects the missing operational chain:
+## Live demo
 
-```text
-Production Incident ➔ Observe ➔ Correlate Evidence ➔ Generate Hypotheses ➔ Reproduce Failure ➔ Confirm Root Cause ➔ Generate Minimal Patch ➔ Execute Verification Gate ➔ Produce Auditable Report
-```
+Local app URL:
 
-The core demo moment is **NOT** "AI generated a patch."  
-It is: **"The agent proved why the incident happened, produced a minimal fix, and independently verified that the same failure no longer occurs."**
+- http://localhost:8000
 
----
-
-## 🏗️ Architecture & Core Modules
-
-IncidentPilot is built on a modern **React + Vite** frontend UI and **FastAPI** backend with deterministic harness guardrails:
+## Architecture
 
 ```text
-                                 Incident / Telemetry Context
-                                              │
-                                              ▼
-                             ┌─────────────────────────────────┐
-                             │    13-Stage State Machine       │
-                             └─────────────────────────────────┘
-                                              │
-                     ┌────────────────────────┼────────────────────────┐
-                     ▼                        ▼                        ▼
-        ┌─────────────────────────┐ ┌───────────────────┐ ┌────────────────────────┐
-        │ Multi-Hypothesis Engine │ │ Evidence Graph    │ │ Failure Reproduction   │
-        │ (H1, H2, H3 Evaluator)  │ │ (Causal Mapper)   │ │ Counterfactual Proof   │
-        └─────────────────────────┘ └───────────────────┘ └────────────────────────┘
-                     │                        │                        │
-                     └────────────────────────┼────────────────────────┘
-                                              ▼
-                             ┌─────────────────────────────────┐
-                             │       Minimal Patch Engine      │
-                             └─────────────────────────────────┘
-                                              │
-                                              ▼
-                             ┌─────────────────────────────────┐
-                             │   Adversarial Double-Check Gate │
-                             └─────────────────────────────────┘
-                                              │
-                                              ▼
-                             ┌─────────────────────────────────┐
-                             │ Auditable Artifacts & Review    │
-                             └─────────────────────────────────┘
+IncidentPilot
+├── backend (FastAPI server)
+│   ├── API routes for telemetry, artifact generation, status, and review
+│   └── orchestrates the investigation workflow
+├── frontend (React + Vite dashboard)
+│   ├── incident timeline
+│   ├── live investigation stream
+│   ├── status indicators
+│   └── artifact export views
+├── core engine
+│   ├── state_machine.py
+│   ├── hypotheses.py
+│   ├── evidence.py
+│   ├── experiments.py
+│   ├── verifier.py
+│   └── artifact_generator.py
+├── demo-repo
+│   └── isolated app used to simulate and test real incident behavior
+├── data
+│   ├── __init__.py
+│   ├── incidents.py
+│   └── telemetry.py
+├── tests
+│   └── engine and regression checks
+└── tools.py
 ```
 
-### Core Stack
+## Key features
 
-- **React + Vite Frontend (`frontend/`)**: Modern SRE command center dashboard (HTML5, Vanilla CSS glassmorphic dark theme, React hooks, Lucide icons, SSE live event streaming).
-- **FastAPI Backend Server (`server.py`)**: High-performance REST & Server-Sent Events (SSE) server serving API routes and static production build.
-- **Engine Modules (`core/`)**:
-  - `core/state_machine.py`: 13-stage explicit state machine.
-  - `core/hypotheses.py`: Multi-hypothesis evaluator (`H1`, `H2`, `H3`).
-  - `core/evidence.py`: Causal evidence map builder.
-  - `core/experiments.py`: Counterfactual proof & failure reproduction.
-  - `core/verifier.py`: Adversarial double-check verifier & gate.
-  - `core/artifact_generator.py`: Auditable post-mortem bundle generator.
+- Multi-hypothesis investigation
+- Evidence graph mapping
+- Counterfactual failure reproduction
+- Root cause confirmation workflow
+- Minimal patch generation
+- Adversarial verification gate
+- Artifact generation for audit trail
+- Synthetic incident scenarios for demos
 
----
+## Current demo incident
 
-## 📦 Project Structure
+The default scenario is `INC-4821`, a checkout incident caused by expired coupon handling.
+
+The system demonstrates how:
+
+- expired coupon payloads return HTTP 500 unexpectedly
+- generic exception handling masks a domain-specific `AppError`
+- reproduction confirms the root cause
+- a minimal fix restores expected 400 error semantics
+- regression validation confirms the fix is safe
+
+## Tech stack
+
+- Python 3.10+
+- FastAPI
+- React 19
+- Vite
+- Pytest
+- Python-dotenv
+
+## Project structure
 
 ```text
 incidentpilot/
-├── server.py                   # FastAPI Server (API & React Static Server)
-├── run_cli.py                  # CLI runner with live event streaming & --reset flag
-├── agent.py                    # LLM agent loop & state machine generator
-├── tools.py                    # Security sandbox, file tools, pytest runner, git diff
-├── smoke_test.py               # Security & sandbox unit test runner
-├── frontend/                   # React + Vite Web Application UI
-│   ├── src/
-│   │   ├── App.jsx             # React SRE Dashboard Component
-│   │   ├── index.css           # Glassmorphic Dark Theme CSS
-│   │   └── main.jsx
-│   ├── dist/                   # Production React build assets
-│   └── package.json
-├── core/                       # Core Autonomous Engine Modules
-│   ├── state_machine.py        # 13-stage explicit state machine
-│   ├── hypotheses.py           # Multi-hypothesis evaluator & confidence tracker
-│   ├── evidence.py             # Causal evidence graph generator
-│   ├── experiments.py          # Counterfactual proof & failure reproduction
-│   ├── verifier.py             # Adversarial double-check verifier & gate
-│   └── artifact_generator.py   # Multi-artifact exporter
-├── data/                       # Telemetry & Incident Catalog
-│   ├── incidents.py            # INC-4821, INC-7392, INC-9104 catalog
-│   └── telemetry.py            # Telemetry metric series & timeline generator
-├── tests/                      # Core engine unit tests
-│   └── test_engine.py          # Pytest suite for engine modules
-├── demo-repo/                  # Isolated Git repository
-├── requirements.txt
+├── .env.example
+├── .gitignore
 ├── README.md
-└── .gitignore
+├── agent.py
+├── requirements.txt
+├── run_cli.py
+├── server.py
+├── smoke_test.py
+├── tools.py
+├── core/
+│   ├── __init__.py
+│   ├── artifact_generator.py
+│   ├── evidence.py
+│   ├── experiments.py
+│   ├── hypotheses.py
+│   ├── state_machine.py
+│   └── verifier.py
+├── data/
+│   ├── __init__.py
+│   ├── incidents.py
+│   └── telemetry.py
+├── demo-repo/
+│   ├── app/
+│   ├── incident/
+│   ├── logs/
+│   └── tests/
+├── frontend/
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── index.html
+│   └── src/
+├── tests/
+│   ├── __init__.py
+│   └── test_engine.py
+└── .env
 ```
 
----
+## Setup
 
-## ⚡ Quick Start Guide
-
-### 1. Run Unified Web App (React UI + FastAPI)
+1. Clone the repo
 
 ```bash
+git clone https://github.com/Dakshhhhh-ops/incidentpilot.git
 cd incidentpilot
+```
+
+2. Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+On Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+On macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Optional environment configuration
+
+Copy the example config and fill in LLM keys if you want to use live-model-backed investigation.
+
+```bash
+copy .env.example .env
+```
+
+Then edit `.env`:
+
+```env
+LLM_API_KEY=
+OPENAI_API_KEY=
+LLM_MODEL=gpt-4o
+LLM_BASE_URL=
+```
+
+5. Install frontend dependencies
+
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+## Run the app locally
+
+From the project root:
+
+```bash
 python server.py
 ```
-Open your browser at **[http://localhost:8000](http://localhost:8000)**!
 
----
+Then open:
 
-### 2. Run CLI Runner
+```text
+http://localhost:8000
+```
+
+## Run the backend API directly
+
+```bash
+uvicorn server:app --reload --host 127.0.0.1 --port 8000
+```
+
+## Run the tests
+
+```bash
+python -m pytest -q
+```
+
+The project includes a demo repository test suite of the simulated incident scenario.
+
+## CLI mode
+
+You can also run the analysis loop without the frontend:
 
 ```bash
 python run_cli.py
+```
 
-# Reset environment back to v2.4.1 buggy state
+Use reset mode to restore the demo repo to the original buggy baseline:
+
+```bash
 python run_cli.py --reset
 ```
 
----
+## API overview
 
-### 3. Run Core Engine Pytest Suite
+The backend exposes endpoints such as:
+
+- `GET /api/health`
+- `GET /api/scenarios`
+- `GET /api/status`
+- `GET /api/telemetry`
+- `POST /api/run-tests`
+- `POST /api/reset`
+- `GET /api/artifacts`
+- `GET /api/investigate/stream`
+
+## Deployment
+
+### Local deployment
+
+This project is ready to run locally with:
 
 ```bash
-python -m pytest tests/test_engine.py -v
+python server.py
 ```
 
----
+### Render / Railway / similar host
 
-*Synthetic demo data - not real production data.*
+Use the project root as the app root and set the start command to:
+
+```bash
+python server.py
+```
+
+If using a frontend build deployment, ensure the React app is built first:
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+The backend serves the built frontend if `frontend/dist` exists.
+
+## Demo workflow
+
+1. Select an incident scenario
+2. View generated telemetry and timeline
+3. Review evidence graph
+4. Observe hypothesis confidence updates
+5. Reproduce the bug through a controlled request
+6. Confirm root cause using code inspection and logs
+7. Apply minimal fix
+8. Run regression and adversarial verification
+9. Export artifacts and report
+
+## Security notes
+
+The project includes a constrained file-access utility to prevent path traversal and unsafe repo writes. This is designed for the demo environment and helps keep the incident workflow contained to the dedicated demo repository.
+
+## License
+
+This project is intended for educational and demo purposes.
+
+## Contributing
+
+Contributions are welcome. Suggestions for better incidents, tighter verification logic, and stronger automation flows are encouraged.
+
+## Contact
+
+Project repo:
+
+- https://github.com/Dakshhhhh-ops/incidentpilot.git
+
+## Acknowledgements
+
+This project was built as a demo SRE tooling concept for autonomous incident analysis and recovery.
